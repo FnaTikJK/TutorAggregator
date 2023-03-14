@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TutorAggregator", "TutorAggregator\TutorAggregator.csproj", "{073F9BB8-E4BC-4EDB-B621-AFA54525D339}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB0D9A7D-0653-4A54-B2FB-D22796066982}
+	EndGlobalSection
+EndGlobal
