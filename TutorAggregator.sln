@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TutorAggregator", "TutorAggregator\TutorAggregator.csproj", "{073F9BB8-E4BC-4EDB-B621-AFA54525D339}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "TutorAggregator\API.csproj", "{073F9BB8-E4BC-4EDB-B621-AFA54525D339}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{AB1857A8-F7D1-4436-991D-9DA29ED27099}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{2CCAA3C2-3E3F-4F61-ADD9-533CB72020BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{073F9BB8-E4BC-4EDB-B621-AFA54525D339}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB1857A8-F7D1-4436-991D-9DA29ED27099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB1857A8-F7D1-4436-991D-9DA29ED27099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB1857A8-F7D1-4436-991D-9DA29ED27099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB1857A8-F7D1-4436-991D-9DA29ED27099}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CCAA3C2-3E3F-4F61-ADD9-533CB72020BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CCAA3C2-3E3F-4F61-ADD9-533CB72020BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CCAA3C2-3E3F-4F61-ADD9-533CB72020BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CCAA3C2-3E3F-4F61-ADD9-533CB72020BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

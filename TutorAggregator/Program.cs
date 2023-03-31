@@ -1,17 +1,17 @@
-using TutorAggregator.Data;
-using TutorAggregator.ServiceInterfaces;
-using TutorAggregator.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-using TutorAggregator.Helpers;
 using AutoMapper;
-using TutorAggregator.DataEntities;
-using TutorAggregator.Models;
-using TutorAggregator.Controllers;
+using DAL;
+using DAL.Entities;
+using DAL.Interfaces;
+using DAL.Repositories;
+using Logic.Models;
+using Logic.Interfaces;
+using Logic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             RequireExpirationTime = true,
         };
     });
+
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -65,6 +66,7 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ILessonTemplatesService, LessonTemplateService>();

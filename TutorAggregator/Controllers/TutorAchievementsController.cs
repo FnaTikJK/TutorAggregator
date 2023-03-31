@@ -1,18 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Logic.Interfaces;
+using Logic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResultOfTask;
-using TutorAggregator.Models;
-using TutorAggregator.ServiceInterfaces;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace TutorAggregator.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class TutorAchievementsController : ControllerBase
     {
-        private ITutorAchievementsService _tutorAchievementsService;
+        private readonly ITutorAchievementsService _tutorAchievementsService;
 
         public TutorAchievementsController(ITutorAchievementsService tutorAchievementsService)
         {
@@ -31,7 +29,7 @@ namespace TutorAggregator.Controllers
                 : BadRequest(response.Error);
         }
 
-        [HttpGet]
+        [HttpGet("{tutorLogin}")]
         public async Task<ActionResult> GetAchievements(string tutorLogin)
         {
             Result<List<TutorAchievementsDto>> response = await _tutorAchievementsService.GetAchievements(tutorLogin);

@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using TutorAggregator.DataEntities;
-using TutorAggregator.Models;
-using TutorAggregator.ServiceInterfaces;
+using Logic.Interfaces;
+using Logic.Models;
 
 
-namespace TutorAggregator.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -38,6 +36,7 @@ namespace TutorAggregator.Controllers
 
             return Ok(comments);
         }
+
         [HttpGet("TutorRating")]
         public async Task<ActionResult<double?>> GetTutorRating(string tutorLogin)
         {

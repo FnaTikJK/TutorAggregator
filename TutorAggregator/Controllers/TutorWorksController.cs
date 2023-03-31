@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Logic.Interfaces;
+using Logic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResultOfTask;
-using TutorAggregator.Data;
-using TutorAggregator.Models;
-using TutorAggregator.ServiceInterfaces;
 
-namespace TutorAggregator.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -14,7 +12,7 @@ namespace TutorAggregator.Controllers
     {
         private readonly ITutorWorksService _tutorWorksService;
 
-        public TutorWorksController(DataContext database, ITutorWorksService tutorWorksService)
+        public TutorWorksController(ITutorWorksService tutorWorksService)
         {
             _tutorWorksService = tutorWorksService;
         }
@@ -31,7 +29,7 @@ namespace TutorAggregator.Controllers
                 : BadRequest(response.Error);
         }
 
-        [HttpGet]
+        [HttpGet("{tutorLogin}")]
         public async Task<ActionResult> GetWorks(string tutorLogin)
         {
             var response = await _tutorWorksService.GetWorks(tutorLogin);

@@ -1,13 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+using Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using TutorAggregator.Services;
-using Microsoft.EntityFrameworkCore;
-using TutorAggregator.Data;
-using TutorAggregator.DataEntities;
-using TutorAggregator.Models;
-using TutorAggregator.ServiceInterfaces;
+using Logic.Models;
 
-namespace TutorAggregator.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -18,11 +13,18 @@ namespace TutorAggregator.Controllers
         {
             _tree = tree;
         }
+
         [HttpGet("GetItems")]
-        public async IAsyncEnumerable<TutorSearchDTO> GetItemsBySubstring(string? prefix, [FromQuery]TutorSearchFiltersDTO filtersDTO)
+        public async Task<ActionResult<SearchResponse>> GetItemsBySubstring(
+            string? prefix,
+            [FromQuery] TutorSearchFiltersDTO filtersDTO,
+            [FromQuery] int elementsPerPage,
+            [FromQuery] int pageNumber)
         {
-            await foreach (var tutor in _tree.Search(prefix!, filtersDTO!)!)
-                yield return tutor;
+            var result = await _tree.Search(prefix!, filtersDTO!, elementsPerPage, pageNumber);
+            if (result == null)
+                return BadRequest("Ќеверное количество элементов на странице или несуществующа€ страница!");
+            return result;
         }
     }
 }
