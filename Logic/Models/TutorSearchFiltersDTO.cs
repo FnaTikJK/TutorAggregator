@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using DAL.Entities.Enums;
 
 namespace Logic.Models
 {
@@ -7,7 +7,7 @@ namespace Logic.Models
         public string? SubjectName { get; set; }
         public string? Place { get; set; }
         public LessonFormat? LessonFormat { get; set; }
-        public DesiredSex? DesiredSex { get; set; }
-        public DesiredAge? DesiredAge { get; set; }
+        public Sex? DesiredSex { get; set; }
+        public AgeGroup? DesiredAge { get; set; }
     }
 }

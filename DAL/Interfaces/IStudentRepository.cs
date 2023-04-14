@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DAL.Entities;
+﻿using DAL.Entities;
 
 namespace DAL.Interfaces
 {
     public interface IStudentRepository
     {
-        public Task<Student> GetByIdAsync(Guid id);
-        public Task<Student> GetByLoginAsync(string login);
+        public Task<Student> GetByIdAsync(int id);
+        public Task<Student?> GetByLoginAsync(string login);
+        public Student GetByLogin(string login);
         public Task<IEnumerable<Student>> GetAllAsync(Guid id);
-        public Task UpdateOrInsertAsync(Student student);
+        public Task AddAsync(Student student);
+        public Task SaveChangesAsync();
     }
 }

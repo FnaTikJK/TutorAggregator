@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using DAL.Core;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,14 +15,19 @@ namespace DAL.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<Student> GetByIdAsync(Guid id)
+        public async Task<Student> GetByIdAsync(int id)
         {
             return await Set.FindAsync(id);
         }
 
-        public async Task<Student> GetByLoginAsync(string login)
+        public async Task<Student?> GetByLoginAsync(string login)
         {
-            return await Set.FindAsync(login);
+            return await Set.FirstOrDefaultAsync(e => e.Login == login);
+        }
+
+        public Student GetByLogin(string login)
+        {
+            return Set.FirstOrDefault(e => e.Login == login);
         }
 
         public async Task<IEnumerable<Student>> GetAllAsync(Guid id)
@@ -34,15 +35,9 @@ namespace DAL.Repositories
             return await Set.ToListAsync();
         }
 
-        public async Task UpdateOrInsertAsync(Student student)
-        {
-            var existed = await Set.FindAsync(student.Login);
-            if (existed == null)
-                await Set.AddAsync(student);
-            else
-                mapper.Map(student, existed);
-
-            await SaveChangesAsync();
+        public async Task AddAsync(Student student)
+        { 
+            await Set.AddAsync(student);
         }
     }
 }

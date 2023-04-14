@@ -1,5 +1,5 @@
 ﻿using Logic.Models;
-using ResultOfTask;
+using Logic.Helpers;
 
 namespace Logic.Interfaces
 {

@@ -26,7 +26,7 @@ namespace API.Controllers
                 : BadRequest(response.Error);
         }
 
-        [Authorize(Roles="Student")]
+        [Authorize]
         [HttpGet("{login}/auth")]
         public async Task<ActionResult> GetFullInfo(string login)
         {

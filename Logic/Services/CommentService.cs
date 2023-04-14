@@ -1,9 +1,9 @@
 using AutoMapper;
-using DAL;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Logic.Interfaces;
 using Logic.Models;
+using DAL.Core;
 
 namespace Logic.Services
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Logic.Interfaces;
-using Logic.Models;
+using Logic.Models.LessoonTemplate;
 
 namespace API.Controllers
 {
@@ -17,46 +17,35 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<LessonTemplateDTO[]>> GetTemplates(string tutorLogin)
+        public async Task<ActionResult<LessonTemplateOutDTO[]>> GetTemplates(string tutorLogin)
         {
-            var response = await templateService.GetTemplates(tutorLogin);
+            var response = await templateService.GetTemplatesAsync(tutorLogin);
             
             return response.IsSuccess ?
                 Ok(response.Value)
                 : BadRequest(response.Error);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<LessonTemplateDTO>> GetTemplate(int id)
+        [HttpGet("{id}", Name = nameof(GetTemplate))]
+        public async Task<ActionResult<LessonTemplateOutDTO>> GetTemplate(int id)
         {
-            var response = await templateService.GetTemplate(id);
+            var response = await templateService.GetTemplateAsync(id);
 
             return response.IsSuccess ?
                 Ok(response.Value)
-                : BadRequest(response.Error);
-        }
-
-        [Authorize(Roles = "Tutor")]
-        [HttpPost]
-        public async Task<ActionResult> CreateTemplate(LessonTemplateDTO templateDto)
-        {
-            var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await templateService.TryCreateTemplate(tutorLogin, templateDto);
-            
-            return response.IsSuccess ?
-                Ok()
                 : BadRequest(response.Error);
         }
 
         [Authorize(Roles = "Tutor")]
         [HttpPut]
-        public async Task<ActionResult> ChangeTemplate(LessonTemplateDTO templateDto)
+        public async Task<ActionResult> InsertOrUpdateTemplate(LessonTemplateAddDTO templateOutDto)
         {
             var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await templateService.TryChangeTemplate(tutorLogin, templateDto);
-
+            var response = await templateService.InsertOrUpdateTemplateAsync(tutorLogin, templateOutDto);
+            
             return response.IsSuccess ?
-                Ok()
+                response.Value.isInserted ? CreatedAtRoute(nameof(GetTemplate), new { id = response.Value.id }, response.Value.id) 
+                    : Ok()
                 : BadRequest(response.Error);
         }
 
@@ -65,7 +54,7 @@ namespace API.Controllers
         public async Task<ActionResult> DeleteTemplate(int templateId)
         {
             var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await templateService.TryDeleteTemplate(tutorLogin, templateId);
+            var response = await templateService.DeleteTemplateAsync(tutorLogin, templateId);
 
             return response.IsSuccess ?
                 Ok()

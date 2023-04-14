@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DAL.Entities.Enums;
 
 namespace DAL.Entities
 {
@@ -14,9 +15,9 @@ namespace DAL.Entities
         public string PasswordHash { get; set; }
 
         [MaxLength(50)]
-        public string? SecondName { get; set; }
+        public string SecondName { get; set; }
         [MaxLength(50)]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; }
         [MaxLength(50)]
         public string? ThirdName { get; set; }
 
@@ -26,25 +27,13 @@ namespace DAL.Entities
 
         [MinLength(12)]
         [MaxLength(12)]
-        public string? PhoneNumber { get; set; }
-
-        [MaxLength(50)]
+        public string PhoneNumber { get; set; }
         public string? Email { get; set; }
-
         public DateTime? BirthDate { get; set; }
-
-        [MaxLength(7)]
-        public string? Sex { get; set; }
-
-        [MaxLength(150)]
-        public string? PhotoRelativePath { get; set; }
-
-        [MaxLength(500)]
+        public Sex? Sex { get; set; }
+        public string? Photo { get; set; }
         public string? AboutMyself { get; set; }
-
-        [MaxLength(50)]
         public string? Region { get; set; }
-        [MaxLength(250)]
         public string? HowToCommunicate { get; set; }
         public bool? IsVerifiedProfile { get; set; }
 

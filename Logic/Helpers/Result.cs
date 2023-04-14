@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ResultOfTask
+﻿namespace Logic.Helpers
 {
     public struct Result<T>
     {

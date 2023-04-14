@@ -1,29 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using DAL.Entities.Enums;
 
 namespace DAL.Entities
 {
-    public enum LessonFormat: byte
-    {
-        Online,
-        Offline
-    }
-    public enum DesiredSex : byte
-    {
-        Male,
-        Female,
-        All
-    }
-    public enum DesiredAge : byte
-    {
-        Preschoolers,
-        PrimarySchoolers,
-        MiddleSchoolers,
-        HighSchoolers,
-        Students,
-        Adults,
-        All
-    }
     public class LessonTemplate
     {
         [Key]
@@ -33,8 +12,8 @@ namespace DAL.Entities
         public int Price { get; set; }
         public string? Description { get; set; }
         public LessonFormat? LessonFormat { get; set; }
-        public DesiredSex? DesiredSex { get; set; }
-        public DesiredAge? DesiredAge { get; set; }
+        public Sex? DesiredSex { get; set; }
+        public AgeGroup? DesiredAge { get; set; }
 
         public List<Lesson> Lessons { get; set; }
     }

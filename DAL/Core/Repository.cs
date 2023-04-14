@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DAL
+namespace DAL.Core
 {
     public abstract class Repository<TEntity>
         where TEntity : class
@@ -14,7 +14,7 @@ namespace DAL
 
         protected DbSet<TEntity> Set => dataContext.Set<TEntity>();
 
-        protected async Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
             await dataContext.SaveChangesAsync();
         }

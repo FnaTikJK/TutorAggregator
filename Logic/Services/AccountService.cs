@@ -1,36 +1,49 @@
-﻿using DAL;
+﻿using AutoMapper;
 using DAL.Entities;
-using ResultOfTask;
+using Logic.Helpers;
 using Logic.Services.Helpers;
 using Logic.Interfaces;
-using Logic.Models;
+using DAL.Entities.Enums;
+using DAL.Interfaces;
+using Logic.Models.Account;
 
 namespace Logic.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly DataContext _database;
-        private readonly IJWTService _jwtService;
+        private readonly IMapper mapper;
+        private readonly IJWTService jwtService;
+        private readonly IUserRepository userRepository;
+        private readonly IStudentRepository studentRepository;
+        private readonly ITutorRepository tutorRepository;
 
-        public AccountService(DataContext database, IJWTService jwtService)
+        public AccountService(IMapper mapper, IJWTService jwtService, IStudentRepository studentRepository,
+            ITutorRepository tutorRepository, IUserRepository userRepository)
         {
-            _database = database;
-            _jwtService = jwtService;
+            this.mapper = mapper;
+            this.jwtService = jwtService;
+            this.studentRepository = studentRepository;
+            this.tutorRepository = tutorRepository;
+            this.userRepository = userRepository;
         }
 
-        public async Task<Result<string>> Register<TEntity>(AccountRegDTO accountRegDto)
-             where TEntity : class, IAccountEntity, new()
+        public async Task<Result<string>> RegisterAsync(AccountRegDTO accountRegDto)
         {
-            var (user, role) = await _database.FindUserAsync(accountRegDto.Login);
+            var user = await userRepository.GetUserAsync(accountRegDto.Login);
             if (user != null)
                 return Result.Fail<string>("Аккаунт с таким логином уже существует");
-
-            await _database.Set<TEntity>().AddAsync(new TEntity
+            
+            switch (accountRegDto.Role)
             {
-                Login = accountRegDto.Login,
-                PasswordHash = PasswordHasher.ComputeHash(accountRegDto.Password),
-            });
-            await _database.SaveChangesAsync();
+                case Role.Student:
+                    await studentRepository.AddAsync(mapper.Map<Student>(accountRegDto));
+                    await studentRepository.SaveChangesAsync();
+                    break;
+                case Role.Tutor:
+                    await tutorRepository.AddAsync(mapper.Map<Tutor>(accountRegDto));
+                    await tutorRepository.SaveChangesAsync();
+                    break;
+            }
 
             return await Authenticate(new AccountAuthDTO
             {
@@ -41,7 +54,7 @@ namespace Logic.Services
 
         public async Task<Result<string>> Authenticate(AccountAuthDTO accountAuthDto)
         {
-            var (user, role) = await _database.FindUserAsync(accountAuthDto.Login);
+            var user = await userRepository.GetUserAsync(accountAuthDto.Login);
             if (user == null)
                 return Result.Fail<string>("Аккаунта с таким логином не существует");
 
@@ -49,12 +62,12 @@ namespace Logic.Services
             if (!isCorrectPassword)
                 return Result.Fail<string>("Неправильный пароль");
 
-            return Result.Ok(_jwtService.CreateToken(user.Login, role));
+            return Result.Ok(jwtService.CreateToken(user.Login, user.Role));
         }
 
         public async Task<Result<string>> ChangePassword(AccountChangePasswordDTO accountChangePasswordDto)
         {
-            var (user, role) = await _database.FindUserAsync(accountChangePasswordDto.Login);
+            var user = await userRepository.GetUserAsync(accountChangePasswordDto.Login);
             if (user == null)
                 return Result.Fail<string>("Аккаунта с таким логином не существует");
 
@@ -63,7 +76,7 @@ namespace Logic.Services
                 return Result.Fail<string>("Неправильный пароль");
 
             user.PasswordHash = PasswordHasher.ComputeHash(accountChangePasswordDto.NewPassword);
-            await _database.SaveChangesAsync();
+            await userRepository.UpdateAndSaveAsync(user);
 
             return Result.Ok("");
         }

@@ -1,8 +1,7 @@
-﻿using DAL.Entities;
-using Logic.Interfaces;
+﻿using Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using ResultOfTask;
-using Logic.Models;
+using Logic.Helpers;
+using Logic.Models.Account;
 
 namespace API.Controllers
 {
@@ -20,13 +19,7 @@ namespace API.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult> RegisterAccount(AccountRegDTO accountRegDTO)
         {
-            Result<string> response;
-            if (accountRegDTO.Role == "Student")
-                response = (await _accountService.Register<Student>(accountRegDTO))!;
-            else if (accountRegDTO.Role == "Tutor")
-                response = (await _accountService.Register<Tutor>(accountRegDTO))!;
-            else
-                return Unauthorized("Incorrect Role");
+            Result<string> response = await _accountService.RegisterAsync(accountRegDTO);
 
             return response.IsSuccess ? 
                 Ok(response.Value)

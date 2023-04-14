@@ -1,10 +1,11 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using DAL;
 using DAL.Entities;
 using Logic.Models;
 using Logic.Interfaces;
+using DAL.Core;
+using DAL.Entities.Enums;
 
 namespace Logic.Services
 {
@@ -25,12 +26,12 @@ namespace Logic.Services
                 .ToArrayAsync();
             var initialisedTutors = tutorsInDB
                 .Where(t => t.FirstName != null && (prefix == null || FormTutorFullName(t).StartsWith(prefix, true, null))
-                && t.LessonTemplates != null && t.LessonTemplates.Count > 0);
+                /*&& t.LessonTemplates != null && t.LessonTemplates.Count > 0*/);
             var allSatisfyingTutorsList = new List<TutorSearchDTO>();
             foreach (var tutor in initialisedTutors)
             {
                 var tutorDTO = new TutorSearchDTO(tutor);
-                if (filtersDTO == null || SatisfiesAllFilters(tutorDTO, filtersDTO))
+                /*if (filtersDTO == null || SatisfiesAllFilters(tutorDTO, filtersDTO))*/
                     allSatisfyingTutorsList.Add(tutorDTO);
             }
             if (allSatisfyingTutorsList.Count == 0)
@@ -53,8 +54,8 @@ namespace Logic.Services
             return templates
                 .Any(e => (e.Name == filtersDTO.SubjectName || filtersDTO.SubjectName == null)
                 && (e.LessonFormat == filtersDTO.LessonFormat || filtersDTO.LessonFormat == null)
-                && (e.DesiredSex == filtersDTO.DesiredSex || filtersDTO.DesiredSex == DesiredSex.All || filtersDTO.DesiredSex == null)
-                && (e.DesiredAge == filtersDTO.DesiredAge || filtersDTO.DesiredAge == DesiredAge.All || filtersDTO.DesiredAge == null)
+                && (e.DesiredSex == filtersDTO.DesiredSex || filtersDTO.DesiredSex == Sex.Any || filtersDTO.DesiredSex == null)
+                && (e.DesiredAge == filtersDTO.DesiredAge || filtersDTO.DesiredAge == AgeGroup.Any || filtersDTO.DesiredAge == null)
                 && (filtersDTO.Place == null || e.Lessons.Any(l => l.Place == filtersDTO.Place)));
         }
         private string FormTutorFullName(Tutor tutor) => $"{tutor.SecondName} {tutor.FirstName} {tutor.ThirdName}".Trim();

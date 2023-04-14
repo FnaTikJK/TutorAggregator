@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using Logic.Models;
 using Logic.Interfaces;
+using Logic.Models.Lesson;
 
 namespace API.Controllers
 {
@@ -20,23 +18,33 @@ namespace API.Controllers
 
         [Authorize(Roles = "Tutor")]
         [HttpPost]
-        public async Task<ActionResult> CreateLesson(LessonDTO lessonDto)
+        public async Task<ActionResult> CreateLesson(LessonCreateOrUpdateDTO lessonCreateOrUpdateDto)
         {
             var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await _lessonService.TryCreateLesson(tutorLogin, lessonDto);
+            var response = await _lessonService.AddAsync(tutorLogin, lessonCreateOrUpdateDto);
 
-            return response.IsSuccess ?
-                Ok()
+            return response.IsSuccess
+                ? Ok()
                 : BadRequest(response.Error);
         }
-        
-        [HttpGet]
-        public async Task<ActionResult<List<LessonDTO>>> GetLessons([FromQuery]string userLogin)
-        {
-            var response = await _lessonService.GetLessons(userLogin);
 
-            return response.IsSuccess ? 
-                Ok(response.Value)
+        [HttpGet]
+        public async Task<ActionResult<List<LessonOutDTO>>> GetLessons([FromQuery] string userLogin)
+        {
+            var response = await _lessonService.GetAllByLoginAsync(userLogin);
+
+            return response.IsSuccess
+                ? Ok(response.Value)
+                : BadRequest(response.Error);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<LessonOutDTO>> GetLessonByIdAsync(int id)
+        {
+            var response = await _lessonService.GetByIdAsync(id);
+
+            return response.IsSuccess
+                ? Ok(response.Value)
                 : BadRequest(response.Error);
         }
 
@@ -45,19 +53,19 @@ namespace API.Controllers
         public async Task<ActionResult> DeleteLesson(int lessonId)
         {
             var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await _lessonService.Delete(tutorLogin, lessonId);
+            var response = await _lessonService.DeleteAsync(tutorLogin, lessonId);
 
-            return response.IsSuccess ?
-                Ok()
+            return response.IsSuccess
+                ? Ok()
                 : BadRequest(response.Error);
         }
 
         [Authorize(Roles = "Tutor")]
-        [HttpPut]
-        public async Task<ActionResult> ChangeLesson(LessonDTO lessonDto)
+        [HttpPatch]
+        public async Task<ActionResult> ChangeLesson([FromBody] LessonCreateOrUpdateDTO lessonCreateOrUpdateDto)
         {
             var tutorLogin = HttpContext.User.Claims.First().Value;
-            var response = await _lessonService.ChangeLesson(tutorLogin, lessonDto);
+            var response = await _lessonService.ChangeLesson(tutorLogin, lessonCreateOrUpdateDto);
 
             return response.IsSuccess ?
                 Ok()

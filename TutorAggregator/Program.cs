@@ -4,14 +4,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-using AutoMapper;
-using DAL;
-using DAL.Entities;
 using DAL.Interfaces;
 using DAL.Repositories;
-using Logic.Models;
 using Logic.Interfaces;
 using Logic.Services;
+using DAL.Core;
+using Logic.Helpers.Mapper;
+using System.Text.Json.Serialization;
+using API.Config.JSON;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,32 +47,35 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.CreateMap<LessonTemplate, LessonTemplateDTO>();
-    cfg.CreateMap<LessonTemplateDTO, LessonTemplate>();
-    cfg.CreateMap<Student, ProfileDTO>();
-    cfg.CreateMap<Tutor, ProfileDTO>();
-    cfg.CreateMap<ProfileDTO, Student>();
-    cfg.CreateMap<ProfileDTO, Tutor>();
-    cfg.CreateMap<Comment, CommentDTO>();
-    cfg.CreateMap<CommentDTO, Comment>();
-    cfg.CreateMap<LessonDTO, Lesson>();
-    cfg.CreateMap<Lesson, LessonDTO>()
-        .ForMember(dest => dest.AllowedTemplatesId, opt => opt.MapFrom(src => src.AllowedTemplates.Select(e => e.Id).ToList()))
-        .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.Student.Id));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging(true);
 });
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new JsonTimeOnlyConverter());
+});
+
+builder.Services.AddAutoMapper(typeof(AccountMappingProfile));
+builder.Services.AddAutoMapper(typeof(CommentMappingProfile));
+builder.Services.AddAutoMapper(typeof(LessonMappingProfile));
+builder.Services.AddAutoMapper(typeof(LessonTemplateMappingProfile));
+builder.Services.AddAutoMapper(typeof(ProfileMappingProfile));
+
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITutorRepository, TutorRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ILessonTemplatesService, LessonTemplateService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ISearchService, TreeSearchService>();
+builder.Services.AddScoped<ILessonTemplatesRepository, LessonTemplatesRepository>();
 
 var app = builder.Build();
 
@@ -95,3 +98,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

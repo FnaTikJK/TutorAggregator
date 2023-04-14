@@ -1,10 +1,11 @@
 using DAL.Entities;
+using DAL.Entities.Enums;
 
 namespace Logic.Models
 {
     public class TutorSearchDTO
     {
-        public TutorSearchDTO(Tutor tutor)
+        public TutorSearchDTO(DAL.Entities.Tutor tutor)
         {
             Id = tutor.Id;
             Login = tutor.Login;
@@ -13,7 +14,7 @@ namespace Logic.Models
             ThirdName = tutor.ThirdName;
             BirthDate = tutor.BirthDate;
             Sex = tutor.Sex;
-            PhotoRelativePath = tutor.PhotoRelativePath;
+            Photo = tutor.Photo;
             AboutMyself = tutor.AboutMyself;
             Region = tutor.Region;
             HowToCommunicate = tutor.HowToCommunicate;
@@ -32,8 +33,8 @@ namespace Logic.Models
         public string? FullName { get => $"{SecondName} {FirstName} {ThirdName}".Trim(); }
 
         public DateTime? BirthDate { get; set; }
-        public string? Sex { get; set; }
-        public string? PhotoRelativePath { get; set; }
+        public Sex? Sex { get; set; }
+        public string? Photo { get; set; }
 
         public string? AboutMyself { get; set; }
 

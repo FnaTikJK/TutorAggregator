@@ -2,7 +2,7 @@
 using Logic.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ResultOfTask;
+using Logic.Helpers;
 
 namespace API.Controllers
 {

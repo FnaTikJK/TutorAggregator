@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
-using DAL;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using ResultOfTask;
+using Logic.Helpers;
 using Logic.Models;
 using Logic.Interfaces;
+using DAL.Core;
 
 namespace Logic.Services
 {
     public class TutorWorksService : ITutorWorksService
     {
-        private readonly DataContext _database;
-        private readonly IMapper _mapper;
+        private readonly DataContext database;
+        private readonly IMapper mapper;
 
         public TutorWorksService(DataContext database, IMapper mapper)
         {
-            _database = database;
-            _mapper = mapper;
+            this.database = database;
+            this.mapper = mapper;
         }
 
         public async Task<Result<bool>> Create(string tutorLogin, TutorWorkDto workDto)
@@ -28,46 +28,46 @@ namespace Logic.Services
             //        e.Start > workDto.Start && e.Start < workDto.End || e.End > workDto.Start && e.End < workDto.End
             //        || workDto.Start > e.Start && workDto.Start < e.End || workDto.End > e.Start && workDto.End < e.End))
             //    return Result.Fail<bool>("Работы пересекаются");
-            var work = _mapper.Map<TutorWork>(workDto);
-            work.Tutor = await _database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
+            var work = mapper.Map<TutorWork>(workDto);
+            work.Tutor = await database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
 
-            await _database.TutorWorks.AddAsync(work);
-            await _database.SaveChangesAsync();
+            await database.TutorWorks.AddAsync(work);
+            await database.SaveChangesAsync();
             return Result.Ok(true);
         }
 
         public async Task<Result<List<TutorWorkDto>>> GetWorks(string tutorLogin)
         {
-            var (user, role) = await _database.FindUserAsync(tutorLogin);
+            var (user, role) = await database.FindUserAsync(tutorLogin);
             if (user == null)
                 return Result.Fail<List<TutorWorkDto>>("Такого пользователя не существует");
             if (role != "Tutor")
                 return Result.Fail<List<TutorWorkDto>>("Такого преподавателя не существует");
 
-            var works = await _database.TutorWorks
+            var works = await database.TutorWorks
                 .Where(e => e.Tutor.Login == tutorLogin)
-                .Select(e => _mapper.Map<TutorWorkDto>(e))
+                .Select(e => mapper.Map<TutorWorkDto>(e))
                 .ToListAsync();
             return Result.Ok(works);
         }
 
         public async Task<Result<bool>> DeleteWork(string tutorLogin, int id)
         {
-            var work = await _database.TutorWorks.Include(w => w.Tutor)
+            var work = await database.TutorWorks.Include(w => w.Tutor)
                 .FirstOrDefaultAsync(e => e.Id == id);
             if (work == null)
                 return Result.Fail<bool>("Такой записи нет");
             if (work.Tutor.Login != tutorLogin)
                 return Result.Fail<bool>("У вас нет доступа");
 
-            _database.TutorWorks.Remove(work);
-            await _database.SaveChangesAsync();
+            database.TutorWorks.Remove(work);
+            await database.SaveChangesAsync();
             return Result.Ok(true);
         }
 
         public async Task<Result<bool>> ChangeWork(string tutorLogin, TutorWorkDto workDto)
         {
-            var work = await _database.TutorWorks.Include(w => w.Tutor)
+            var work = await database.TutorWorks.Include(w => w.Tutor)
                 .FirstOrDefaultAsync(e => e.Id == workDto.Id);
             if (work == null)
                 return Result.Fail<bool>("Такой записи не существует");
@@ -78,11 +78,11 @@ namespace Logic.Services
                     || workDto.Start > e.Start && workDto.Start < e.End || workDto.End > e.Start && workDto.End < e.End)))
                 return Result.Fail<bool>("Работы пересекаются");
 
-            var newWork = _mapper.Map<TutorWork>(workDto);
+            var newWork = mapper.Map<TutorWork>(workDto);
             newWork.Tutor = work.Tutor;
-            _database.Entry(work)
+            database.Entry(work)
                 .CurrentValues.SetValues(newWork);
-            await _database.SaveChangesAsync();
+            await database.SaveChangesAsync();
             return Result.Ok(true);
         }
 

@@ -2,11 +2,11 @@
 using DAL.Entities;
 using Logic.Models;
 
-namespace Logic.Services.Helpers
+namespace Logic.Helpers.Mapper
 {
-    public class AppMappingProfile : Profile
+    public class ProfileMappingProfile : Profile
     {
-        public AppMappingProfile()
+        public ProfileMappingProfile()
         {
             CreateMap<Student, ProfileDTO>().ReverseMap();
             CreateMap<Tutor, ProfileDTO>().ReverseMap();

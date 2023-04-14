@@ -1,8 +1,7 @@
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
-namespace DAL
+namespace DAL.Core
 {
     public class DataContext : DbContext
     {
@@ -15,10 +14,7 @@ namespace DAL
         {
             Database.EnsureDeleted();
             Database.EnsureCreated();
-            Students.Add(new Student() {Login = "s", PasswordHash = passHashS});
-            Students.Add(new Student() {Login = "s2", PasswordHash = passHashS});
-            Tutors.Add(new Tutor() { Login = "t", PasswordHash = passHashS });
-            Tutors.Add(new Tutor() { Login = "t2", PasswordHash = passHashS });
+            BaseEntitiesAddition.Add(this, 12);
             SaveChanges();
         }
 
@@ -44,9 +40,5 @@ namespace DAL
         public DbSet<Lesson> Lessons => Set<Lesson>();
         public DbSet<TutorAchievements> TutorAchievements => Set<TutorAchievements>();
         public DbSet<TutorWork> TutorWorks => Set<TutorWork>();
-
-        // ץור מע 's'
-        private string passHashS =
-            "pIg20fAaHpUDZxibspj/8OxrP5kgjxYxpqn+jL4pNvEDeA+zbmItcVo1GpIS4ELmf3O0ELkV47qgkYeemrN2y/Fc6ZJfFdnDB2QH+vzVowG0kFTylw6GZdRvJSuuXTuyvdFerxvnNP+hM6mD9GGo+BUJxMb61G82tblDL5kowIfF+ihSQotRUwZTMHHUeI9D9x0t46byg6h+KHFHkkau9FaE5k/TEC22VdOkOII7CpU+D3JhSTMCUeBAVUmdZMpB";
     }
 }

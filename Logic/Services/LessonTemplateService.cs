@@ -1,91 +1,76 @@
 ﻿using AutoMapper;
-using DAL;
 using DAL.Entities;
-using Microsoft.EntityFrameworkCore;
-using ResultOfTask;
-using Logic.Models;
+using Logic.Helpers;
 using Logic.Interfaces;
+using DAL.Interfaces;
+using Logic.Models.LessoonTemplate;
 
 namespace Logic.Services
 {
     public class LessonTemplateService : ILessonTemplatesService
     {
-        private DataContext _database;
-        private IMapper _mapper;
+        private readonly IMapper mapper;
+        private readonly ILessonTemplatesRepository templatesRepository;
+        private readonly ITutorRepository tutorRepository;
 
-        public LessonTemplateService(DataContext database, IMapper mapper)
+        public LessonTemplateService(IMapper mapper, ILessonTemplatesRepository templatesRepository, ITutorRepository tutorRepository)
         {
-            _database = database;
-            _mapper = mapper;
+            this.mapper = mapper;
+            this.templatesRepository = templatesRepository;
+            this.tutorRepository = tutorRepository;
         }
 
-        public async Task<Result<LessonTemplateDTO[]>> GetTemplates(string tutorLogin)
+        public async Task<Result<LessonTemplateOutDTO[]>> GetTemplatesAsync(string tutorLogin)
         {
-            var tutor = await _database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
-            if (tutor == null)
-                return Result.Fail<LessonTemplateDTO[]>("Такого рептитора не существует");
-
-            var templates = await _database.LessonTemplates
-                .Where(e => e.Tutor == tutor)
-                .Select(e => _mapper.Map<LessonTemplateDTO>(e))
-                .ToArrayAsync();
+            var templates = (await templatesRepository.GetAllByTutorAsync(tutorLogin))
+                .Select(mapper.Map<LessonTemplateOutDTO>)
+                .ToArray();
 
             return Result.Ok(templates);
         }
 
-        public async Task<Result<LessonTemplateDTO>> GetTemplate(int id)
+        public async Task<Result<LessonTemplateOutDTO>> GetTemplateAsync(int id)
         {
-            var template = await _database.LessonTemplates.FirstOrDefaultAsync(e => e.Id == id);
+            var template = await templatesRepository.GetByIdAsync(id);
             if (template == null)
-                return Result.Fail<LessonTemplateDTO>("Такого шаблона не существует");
+                return Result.Fail<LessonTemplateOutDTO>("Такого шаблона не существует");
 
-            return Result.Ok(_mapper.Map<LessonTemplateDTO>(template));
+            return Result.Ok(mapper.Map<LessonTemplateOutDTO>(template));
         }
 
-        public async Task<Result<bool>> TryCreateTemplate(string tutorLogin, LessonTemplateDTO templateDto)
+        public async Task<Result<(int id, bool isInserted)>> InsertOrUpdateTemplateAsync(string tutorLogin, LessonTemplateAddDTO templateAddDto)
         {
-            var tutor = await _database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
+            var tutor = await tutorRepository.GetByLoginAsync(tutorLogin);
             if (tutor == null)
-                return Result.Fail<bool>("Такого репетитора не существует");
-            if (_database.LessonTemplates
-                    .Any(e => e.Tutor == tutor && e.Name == templateDto.Name))
-                return Result.Fail<bool>("Шаблон с таким именем уже существует");
+                return Result.Fail<(int id, bool isInserted)>("Такого репетитора не существует");
 
-            var template = _mapper.Map<LessonTemplate>(templateDto);
-            template.Tutor = tutor;
-            await _database.LessonTemplates.AddAsync(template);
-            await _database.SaveChangesAsync();
+            var existed = await templatesRepository.GetByIdAsync(templateAddDto.Id);
+            if (existed == null)
+            {
+                var template = mapper.Map<LessonTemplate>(templateAddDto);
+                template.Tutor = tutor;
+                await templatesRepository.AddAsync(template);
+                await templatesRepository.SaveChangesAsync();
+                return Result.Ok((template.Id, true));
+            }
+            
+            if (existed.Tutor.Login != tutorLogin)
+                return Result.Fail<(int id, bool isInserted)>("У вас нет доступа к шаблону");
 
-            return Result.Ok(true);
+            mapper.Map(templateAddDto, existed);
+            await templatesRepository.SaveChangesAsync();
+            return Result.Ok((-1, false));
         }
 
-        public async Task<Result<bool>> TryChangeTemplate(string tutorLogin, LessonTemplateDTO templateDto)
+        public async Task<Result<bool>> DeleteTemplateAsync(string tutorLogin, int templateId)
         {
-            var tutor = await _database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
-            var newTemplate = _mapper.Map<LessonTemplate>(templateDto);
-            newTemplate.Tutor = tutor;
-            var template = await _database.LessonTemplates
-                .FirstOrDefaultAsync(e => e.Id == templateDto.Id && e.Tutor == tutor);
-            if (template == null)
-                return Result.Fail<bool>("Такого шаблона не существует или у вас нет к нему доступа");
+            var template = await templatesRepository.GetByIdAsync(templateId);
 
-            _database.Entry(template)
-                .CurrentValues.SetValues(newTemplate);
-            await _database.SaveChangesAsync();
-
-            return Result.Ok(true);
-        }
-
-        public async Task<Result<bool>> TryDeleteTemplate(string tutorLogin, int templateId)
-        {
-            var tutor = await _database.Tutors.FirstOrDefaultAsync(e => e.Login == tutorLogin);
-            var template = await _database.LessonTemplates
-                .FirstOrDefaultAsync(e => e.Id == templateId && e.Tutor == tutor);
-            if (template == null)
-                return Result.Fail<bool>("Такого шаблона не существует или у вас нет к нему доступа");
-
-            _database.Remove(template);
-            await _database.SaveChangesAsync();
+            if (template.Tutor.Login == tutorLogin)
+            {
+                templatesRepository.Delete(template);
+                await templatesRepository.SaveChangesAsync();
+            }
 
             return Result.Ok(true);
         }

@@ -1,4 +1,4 @@
-﻿using DAL;
+﻿using DAL.Core;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

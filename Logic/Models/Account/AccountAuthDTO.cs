@@ -1,4 +1,4 @@
-﻿namespace Logic.Models
+﻿namespace Logic.Models.Account
 {
     public class AccountAuthDTO
     {

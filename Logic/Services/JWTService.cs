@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DAL.Entities.Enums;
 using Logic.Interfaces;
 using Microsoft.Extensions.Configuration;
 
@@ -8,23 +9,23 @@ namespace Logic.Services
 {
     public class JWTService : IJWTService
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration configuration;
 
         public JWTService(IConfiguration configuration)
         {
-            _configuration = configuration;
+            this.configuration = configuration;
         }
 
-        public string CreateToken(string login, string role)
+        public string CreateToken(string login, Role role)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, login),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Role, role.ToString())
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
+                configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
